@@ -1,16 +1,13 @@
-import Database from "better-sqlite3";
+import Database from "bun:sqlite";
 import "dotenv/config";
-import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 import { z } from "zod";
 
 const EnvSchema = z.object({
-  DATABASE_URL: z.string().url(),
+  DB_FILE_NAME: z.string().url(),
 });
 
 const processEnv = EnvSchema.parse(process.env);
 
-const sqlite = new Database(processEnv.DATABASE_URL);
-export const db: BetterSQLite3Database = drizzle({ client: sqlite });
-
-// const res = await db.execute("select 1");
-// console.log(res);
+const sqlite = new Database(processEnv.DB_FILE_NAME);
+export const db = drizzle({ client: sqlite });
