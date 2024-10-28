@@ -1,7 +1,9 @@
 // PACKAGES
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { generateId } from "lucia";
+import postgres from "postgres";
 
 // LOCAL MODULES
 import { db } from "@/adapter";
@@ -10,8 +12,6 @@ import { userTable } from "@/db/schemas/auth";
 import { lucia } from "@/lucia";
 import { signupSchema } from "@/shared/schema";
 import type { SuccessResponse } from "@/shared/types";
-import { HTTPException } from "hono/http-exception";
-import postgres from "postgres";
 
 export const authRouter = new Hono<Context>().post(
   "/signup",
