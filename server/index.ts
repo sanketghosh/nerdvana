@@ -1,20 +1,37 @@
-// import { swaggerUI } from "@hono/swagger-ui";
-
-// packages
+// PACKAGES
 import "dotenv/config";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 
-// Local modules
+// LOCAL MODULES
 import type { Context } from "@/context";
 import { lucia } from "@/lucia";
 import type { ErrorResponse } from "@/shared/types";
+import { authRouter } from "./routes/auth.routes";
 
 const app = new Hono<Context>();
 
 /**
- * Lucia middleware for authentication
+ * Middleware to handle session management and CORS.
+ *
+ * This middleware checks for a session cookie in the incoming request.
+ * If a valid session ID is found, it validates the session and retrieves
+ * the corresponding user information. It also manages the session cookies
+ * based on the freshness of the session.
+ *
+ * @function
+ * @param {Object} c - The context object containing request and response information.
+ * @param {Function} next - The next middleware function in the stack.
+ *
+ * @returns {Promise<void>} - A promise that resolves when the next middleware is called.
+ *
+ * @throws {Error} - Throws an error if session validation fails or if there are issues with cookie serialization.
+ *
+ * @example
+ * app.use("*", cors(), async (c, next) => {
+ *   // Middleware implementation
+ * });
  */
 
 app.use("*", cors(), async (c, next) => {
@@ -41,6 +58,8 @@ app.use("*", cors(), async (c, next) => {
   c.set("user", user);
   return next();
 });
+
+const routes = app.basePath("/api/v1").route("/auth", authRouter);
 
 /**
  *  Global Error Handler for the Hono app.
@@ -99,3 +118,4 @@ app.onError((err, c) => {
 });
 
 export default app;
+export type APIRoutes = typeof routes;

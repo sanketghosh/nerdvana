@@ -6,11 +6,11 @@ dotenv.config({
 });
 
 export default defineConfig({
-  dialect: "sqlite",
+  dialect: "postgresql",
   out: "./drizzle",
   schema: "./server/db/schemas/*",
   strict: true,
   dbCredentials: {
-    url: process.env["DB_FILE_NAME"]!,
+    url: process.env["DATABASE_URL"]!,
   },
 }) as Config;
