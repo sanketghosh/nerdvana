@@ -18,6 +18,10 @@ import type { SuccessResponse } from "@/shared/types";
 /**
  *
  *
+ *
+ *
+ *
+ *
  */
 
 export const authRouter = new Hono<Context>()
@@ -50,6 +54,9 @@ export const authRouter = new Hono<Context>()
       if (error instanceof postgres.PostgresError && error.code === "23505") {
         throw new HTTPException(409, {
           message: "Username is already in use.",
+          cause: {
+            form: true,
+          },
         });
       }
 
@@ -70,6 +77,9 @@ export const authRouter = new Hono<Context>()
     if (!existingUser) {
       throw new HTTPException(401, {
         message: "User with this username does not exist.",
+        cause: {
+          form: true,
+        },
       });
     }
 
@@ -81,6 +91,9 @@ export const authRouter = new Hono<Context>()
     if (!validPassword) {
       throw new HTTPException(401, {
         message: "Password is not correct.",
+        cause: {
+          form: true,
+        },
       });
     }
 
@@ -104,9 +117,7 @@ export const authRouter = new Hono<Context>()
     }
 
     await lucia.invalidateSession(session.id);
-    c.header("Set-Cookie", lucia.createBlankSessionCookie().serialize(), {
-      append: true,
-    });
+    c.header("Set-Cookie", lucia.createBlankSessionCookie().serialize());
     return c.redirect("/");
   })
   .get("/user", isLoggedIn, async (c) => {
